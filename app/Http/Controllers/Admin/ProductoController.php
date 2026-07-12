@@ -37,11 +37,24 @@ class ProductoController extends Controller
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'activo' => 'boolean',
+            'en_oferta' => 'boolean',
+            'es_nuevo' => 'boolean',
+            'material' => 'nullable|string|max:255',
+            'tamano' => 'nullable|string|max:255',
+            'tipo_producto' => 'required|in:stock,preventa,exclusivo',
+            'fecha_inicio_preventa' => 'nullable|date',
+            'fecha_fin_preventa' => 'nullable|date',
+            'fecha_disponibilidad' => 'nullable|date',
+            'tipo_pago_preventa' => 'nullable|in:completo,parcial',
+            'porcentaje_anticipo' => 'nullable|numeric|min:1|max:99',
+            'limite_preventa' => 'nullable|integer|min:1',
             'imagen' => 'nullable|image|max:10240', // max 10MB
         ]);
 
         $producto = new Producto($validated);
         $producto->activo = $request->boolean('activo', true);
+        $producto->en_oferta = $request->boolean('en_oferta', false);
+        $producto->es_nuevo = $request->boolean('es_nuevo', true);
 
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('productos', 'public');
@@ -78,6 +91,17 @@ class ProductoController extends Controller
                 'precio' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
                 'activo' => 'boolean',
+                'en_oferta' => 'boolean',
+                'es_nuevo' => 'boolean',
+                'material' => 'nullable|string|max:255',
+                'tamano' => 'nullable|string|max:255',
+                'tipo_producto' => 'required|in:stock,preventa,exclusivo',
+                'fecha_inicio_preventa' => 'nullable|date',
+                'fecha_fin_preventa' => 'nullable|date',
+                'fecha_disponibilidad' => 'nullable|date',
+                'tipo_pago_preventa' => 'nullable|in:completo,parcial',
+                'porcentaje_anticipo' => 'nullable|numeric|min:1|max:99',
+                'limite_preventa' => 'nullable|integer|min:1',
                 'imagen' => 'nullable|image|max:10240',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -87,6 +111,8 @@ class ProductoController extends Controller
 
         $producto->fill($validated);
         $producto->activo = $request->boolean('activo', true);
+        $producto->en_oferta = $request->boolean('en_oferta', false);
+        $producto->es_nuevo = $request->boolean('es_nuevo', true);
 
         if ($request->hasFile('imagen')) {
             // Delete old image if exists

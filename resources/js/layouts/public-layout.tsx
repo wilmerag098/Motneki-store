@@ -1,4 +1,13 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import {
     Search,
@@ -16,17 +25,31 @@ import {
     MessageCircle,
     CreditCard,
     Banknote,
-    Bitcoin
+    Bitcoin,
+    Facebook,
+    Instagram,
+    Twitter,
+    Youtube,
+    LogOut,
+    Settings
 } from 'lucide-react';
 import { login, dashboard } from '@/routes';
-import AppearanceToggleTab from '@/components/appearance-tabs';
+import AppearanceDropdown from '@/components/appearance-dropdown';
 import SearchModal from '@/components/SearchModal';
+import SlideOverCart from '@/components/SlideOverCart';
+import QuickViewModal from '@/components/QuickViewModal';
+import { useStore } from '@/store/useStore';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     const { url, props } = usePage();
     const { auth } = props as any;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    
+    // Global Store connections
+    const { toggleCart, getCartCount, wishlist } = useStore();
+    const cartCount = getCartCount();
+    const wishlistCount = wishlist.length;
     return (
         <div className="min-h-screen bg-[#FAF5F0] dark:bg-[#131313] text-[#1C1612] dark:text-[#ffffff] font-sans antialiased selection:bg-[#C25910] selection:text-white flex flex-col">
             {/* BARRA DE NAVEGACIÓN */}
@@ -89,16 +112,40 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                         </button>
 
                         {auth?.user ? (
-                            <Link
-                                href={auth.user.rol?.nombre === 'Administrador' ? '/admin' : dashboard()}
-                                className="text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full"
-                                title="Panel"
-                            >
-                                <User className="w-5 h-5" />
-                            </Link>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full focus:outline-none">
+                                        <User className="w-5 h-5" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 bg-[#181818] border-[#333333] text-white">
+                                    <DropdownMenuLabel className="font-normal">
+                                        <div className="flex flex-col space-y-1">
+                                            <p className="text-sm font-medium leading-none text-white">{auth.user.nombre}</p>
+                                            <p className="text-xs leading-none text-[#888888]">{auth.user.email}</p>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-[#333333]" />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem asChild className="hover:bg-[#ff5500]/20 focus:bg-[#ff5500]/20 hover:text-white focus:text-white cursor-pointer">
+                                            <Link href={auth.user.rol?.nombre === 'Administrador' ? '/admin' : '/dashboard'} className="w-full flex items-center">
+                                                <User className="mr-2 h-4 w-4" />
+                                                <span>Mi Panel</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator className="bg-[#333333]" />
+                                    <DropdownMenuItem asChild className="hover:bg-red-500/20 focus:bg-red-500/20 text-red-500 hover:text-red-500 focus:text-red-500 cursor-pointer">
+                                        <Link href="/logout" method="post" as="button" className="w-full flex items-center">
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            <span>Cerrar Sesión</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         ) : (
                             <Link
-                                href={login()}
+                                href="/login"
                                 className="text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full"
                                 title="Iniciar Sesión"
                             >
@@ -106,21 +153,29 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                             </Link>
                         )}
 
-                        <Link href="/favoritos" className={`text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full ${url.startsWith('/favoritos') ? 'text-[#ff5500] bg-[#3a3939]' : ''}`}>
+                        <Link href="/favoritos" className={`text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full relative ${url.startsWith('/favoritos') ? 'text-[#ff5500] bg-[#3a3939]' : ''}`}>
                             <Heart className="w-5 h-5" />
+                            {wishlistCount > 0 && (
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-[#ff5500] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#FAF5F0] dark:border-[#131313]">{wishlistCount}</span>
+                            )}
                         </Link>
-                        <Link href="/carrito" className={`text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full relative ${url.startsWith('/carrito') ? 'text-[#ff5500] bg-[#3a3939]' : ''}`}>
+                        <button onClick={toggleCart} className={`text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] transition-colors p-2 hover:bg-[#3a3939] rounded-full relative ${url.startsWith('/carrito') ? 'text-[#ff5500] bg-[#3a3939]' : ''}`}>
                             <ShoppingCart className="w-5 h-5" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-[#ff5500] rounded-full"></span>
-                        </Link>
-                        <AppearanceToggleTab className="ml-2" />
+                            {cartCount > 0 && (
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-[#ff5500] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#FAF5F0] dark:border-[#131313]">{cartCount}</span>
+                            )}
+                        </button>
+                        <AppearanceDropdown className="ml-2" />
                     </div>
 
                     {/* Botón de Menú Móvil */}
                     <div className="md:hidden flex items-center gap-4">
-                        <Link href="/carrito" className={`p-2 rounded-full ${url.startsWith('/carrito') ? 'text-[#ff5500] bg-[#3a3939]' : 'text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] hover:bg-[#3a3939]'}`}>
+                        <button onClick={toggleCart} className={`p-2 rounded-full relative ${url.startsWith('/carrito') ? 'text-[#ff5500] bg-[#3a3939]' : 'text-[#888888] dark:text-[#9ca3af] hover:text-[#ff5500] hover:bg-[#3a3939]'}`}>
                             <ShoppingCart className="w-5 h-5" />
-                        </Link>
+                            {cartCount > 0 && (
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-[#ff5500] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#FAF5F0] dark:border-[#131313]">{cartCount}</span>
+                            )}
+                        </button>
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             className="text-[#1C1612] dark:text-[#ffffff] p-2 hover:bg-[#3a3939] rounded-full"
@@ -179,7 +234,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                                 <Link href={login()} className="hover:text-[#ff5500] p-2"><User className="w-5 h-5" /></Link>
                             )}
                             <Link href="/favoritos" className={`p-2 ${url.startsWith('/favoritos') ? 'text-[#ff5500]' : 'hover:text-[#ff5500]'}`}><Heart className="w-5 h-5" /></Link>
-                            <AppearanceToggleTab className="scale-90" />
+                            <AppearanceDropdown className="scale-90" />
                         </div>
                     </div>
                 )}
@@ -205,11 +260,21 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                             Conectamos coleccionistas con piezas únicas, auténticas y difíciles de conseguir.
                         </p>
                         <div className="flex items-center gap-4 text-white">
-                            <Globe className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
-                            <Camera className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
-                            <MessageSquare className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
-                            <Smartphone className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
-                            <MessageCircle className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            <a href="https://facebook.com/motnekistore" target="_blank" rel="noreferrer" title="Facebook">
+                                <Facebook className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            </a>
+                            <a href="https://instagram.com/motnekistore" target="_blank" rel="noreferrer" title="Instagram">
+                                <Instagram className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            </a>
+                            <a href="https://twitter.com/motnekistore" target="_blank" rel="noreferrer" title="Twitter">
+                                <Twitter className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            </a>
+                            <a href="https://youtube.com/motnekistore" target="_blank" rel="noreferrer" title="YouTube">
+                                <Youtube className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            </a>
+                            <a href="https://wa.me/123456789" target="_blank" rel="noreferrer" title="WhatsApp">
+                                <MessageCircle className="w-5 h-5 hover:text-[#ff5500] cursor-pointer transition-colors" />
+                            </a>
                         </div>
                     </div>
 
@@ -281,6 +346,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </footer>
 
             <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+            <SlideOverCart />
+            <QuickViewModal />
         </div>
     );
 }

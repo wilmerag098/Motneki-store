@@ -6,6 +6,7 @@ use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
@@ -25,9 +26,11 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return User::create([
-            'name' => $input['name'],
+            'id_rol' => 2,
+            'nombre' => $input['nombre'],
             'email' => $input['email'],
-            'password' => $input['password'],
+            'telefono' => $input['telefono'],
+            'password_hash' => Hash::make($input['password']),
         ]);
     }
 }

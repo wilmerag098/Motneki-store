@@ -34,7 +34,7 @@ class FortifyServiceProvider extends ServiceProvider
                     }
                     
                     // Si es cliente, redirigir al home por defecto (ej. /dashboard)
-                    return redirect()->intended(config('fortify.welcome'));
+                    return redirect()->intended(config('fortify.home'));
                 }
             };
         });

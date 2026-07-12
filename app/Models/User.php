@@ -70,4 +70,19 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(Pedido::class, 'id_usuario');
     }
+
+    public function solicitudesPersonalizadas()
+    {
+        return $this->hasMany(SolicitudPersonalizada::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function getIdAttribute()
+    {
+        return $this->id_usuario;
+    }
+
+    public function passkeys(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\Laravel\Passkeys\Passkey::class, 'user_id');
+    }
 }

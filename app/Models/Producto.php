@@ -21,8 +21,29 @@ class Producto extends Model
         'descripcion',
         'precio',
         'stock',
+        'disponibilidad',
+        'material',
+        'tamano',
+        'valoracion',
+        'en_oferta',
+        'es_nuevo',
+        'ventas',
         'activo',
         'imagen_url',
+        'tipo_producto',
+        'fecha_inicio_preventa',
+        'fecha_fin_preventa',
+        'fecha_disponibilidad',
+        'tipo_pago_preventa',
+        'porcentaje_anticipo',
+        'limite_preventa',
+    ];
+
+    protected $casts = [
+        'fecha_inicio_preventa' => 'date',
+        'fecha_fin_preventa' => 'date',
+        'fecha_disponibilidad' => 'date',
+        'porcentaje_anticipo' => 'decimal:2',
     ];
 
     public function categoria()

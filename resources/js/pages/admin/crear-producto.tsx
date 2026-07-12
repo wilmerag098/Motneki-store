@@ -21,6 +21,17 @@ export default function CrearProducto({ categorias }: Props) {
         precio: '',
         stock: 0,
         activo: true,
+        en_oferta: false,
+        es_nuevo: true,
+        material: '',
+        tamano: '',
+        tipo_producto: 'stock', // stock, preventa, exclusivo
+        fecha_inicio_preventa: '',
+        fecha_fin_preventa: '',
+        fecha_disponibilidad: '',
+        tipo_pago_preventa: 'completo', // completo, parcial
+        porcentaje_anticipo: '',
+        limite_preventa: '',
         imagen: null as File | null,
     });
 
@@ -117,6 +128,29 @@ export default function CrearProducto({ categorias }: Props) {
                                     </div>
                                 </div>
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">MATERIAL (OPCIONAL)</label>
+                                        <input
+                                            type="text"
+                                            value={data.material}
+                                            onChange={e => setData('material', e.target.value)}
+                                            placeholder="Ej. PVC, ABS"
+                                            className="w-full bg-[#fcfcfc] border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">TAMAÑO (OPCIONAL)</label>
+                                        <input
+                                            type="text"
+                                            value={data.tamano}
+                                            onChange={e => setData('tamano', e.target.value)}
+                                            placeholder="Ej. 32 cm, Escala 1/7"
+                                            className="w-full bg-[#fcfcfc] border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                        />
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">DESCRIPCIÓN</label>
                                     <textarea
@@ -129,16 +163,38 @@ export default function CrearProducto({ categorias }: Props) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">ESTADO</label>
-                                    <div className="bg-[#fcfcfc] border border-gray-200 rounded-sm py-3 px-5 flex items-center justify-between">
-                                        <span className="text-sm text-gray-800">Producto Activo en Tienda</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => setData('activo', !data.activo)}
-                                            className={`w-12 h-6 rounded-full p-1 transition-colors relative focus:outline-none ${data.activo ? 'bg-[#ff5500]' : 'bg-gray-300'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${data.activo ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                                        </button>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">ESTADO Y BADGES</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-[#fcfcfc] border border-gray-200 rounded-sm py-3 px-5 flex items-center justify-between">
+                                            <span className="text-sm text-gray-800">Activo en Tienda</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setData('activo', !data.activo)}
+                                                className={`w-10 h-5 rounded-full p-0.5 transition-colors relative focus:outline-none ${data.activo ? 'bg-[#ff5500]' : 'bg-gray-300'}`}
+                                            >
+                                                <div className={`w-4 h-4 rounded-full bg-white transition-transform ${data.activo ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                                            </button>
+                                        </div>
+                                        <div className="bg-[#fcfcfc] border border-gray-200 rounded-sm py-3 px-5 flex items-center justify-between">
+                                            <span className="text-sm text-gray-800">Es Nuevo</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setData('es_nuevo', !data.es_nuevo)}
+                                                className={`w-10 h-5 rounded-full p-0.5 transition-colors relative focus:outline-none ${data.es_nuevo ? 'bg-[#ff5500]' : 'bg-gray-300'}`}
+                                            >
+                                                <div className={`w-4 h-4 rounded-full bg-white transition-transform ${data.es_nuevo ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                                            </button>
+                                        </div>
+                                        <div className="bg-[#fcfcfc] border border-gray-200 rounded-sm py-3 px-5 flex items-center justify-between">
+                                            <span className="text-sm text-gray-800">En Oferta</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setData('en_oferta', !data.en_oferta)}
+                                                className={`w-10 h-5 rounded-full p-0.5 transition-colors relative focus:outline-none ${data.en_oferta ? 'bg-[#ff5500]' : 'bg-gray-300'}`}
+                                            >
+                                                <div className={`w-4 h-4 rounded-full bg-white transition-transform ${data.en_oferta ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -193,6 +249,134 @@ export default function CrearProducto({ categorias }: Props) {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* SALES CONDITIONS CARD */}
+                        <div className="bg-white border border-gray-200 shadow-sm p-8">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-1.5 h-6 bg-[#111]"></div>
+                                <h3 className="text-[#111] text-lg font-bold tracking-tight">CONDICIONES DE VENTA</h3>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">TIPO DE PRODUCTO</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setData('tipo_producto', 'stock')}
+                                            className={`py-3 text-xs font-bold uppercase tracking-widest rounded-sm border transition-all ${data.tipo_producto === 'stock' ? 'bg-[#111] text-white border-[#111]' : 'bg-[#fcfcfc] text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        >
+                                            STOCK
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setData('tipo_producto', 'preventa')}
+                                            className={`py-3 text-xs font-bold uppercase tracking-widest rounded-sm border transition-all ${data.tipo_producto === 'preventa' ? 'bg-[#111] text-white border-[#111]' : 'bg-[#fcfcfc] text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        >
+                                            PREVENTA
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setData('tipo_producto', 'exclusivo')}
+                                            className={`py-3 text-xs font-bold uppercase tracking-widest rounded-sm border transition-all ${data.tipo_producto === 'exclusivo' ? 'bg-[#111] text-white border-[#111]' : 'bg-[#fcfcfc] text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        >
+                                            EXCLUSIVO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {data.tipo_producto === 'preventa' && (
+                                    <div className="bg-orange-50 border border-orange-100 p-6 rounded-sm space-y-6 mt-4">
+                                        <h4 className="text-[#ff5500] text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-[#ff5500]"></span> Configuración de Preventa
+                                        </h4>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">INICIO PREVENTA</label>
+                                                <input
+                                                    type="date"
+                                                    value={data.fecha_inicio_preventa}
+                                                    onChange={e => setData('fecha_inicio_preventa', e.target.value)}
+                                                    className="w-full bg-white border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">FIN PREVENTA (OPCIONAL)</label>
+                                                <input
+                                                    type="date"
+                                                    value={data.fecha_fin_preventa}
+                                                    onChange={e => setData('fecha_fin_preventa', e.target.value)}
+                                                    className="w-full bg-white border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">FECHA DISPONIBILIDAD (ENVÍO)</label>
+                                                <input
+                                                    type="date"
+                                                    value={data.fecha_disponibilidad}
+                                                    onChange={e => setData('fecha_disponibilidad', e.target.value)}
+                                                    className="w-full bg-white border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">LÍMITE DE PREVENTA (STOCK)</label>
+                                                <input
+                                                    type="number"
+                                                    value={data.limite_preventa}
+                                                    onChange={e => setData('limite_preventa', e.target.value)}
+                                                    placeholder="Dejar vacío si es ilimitado"
+                                                    className="w-full bg-white border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">TIPO DE PAGO</label>
+                                            <div className="flex gap-4">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input 
+                                                        type="radio" 
+                                                        checked={data.tipo_pago_preventa === 'completo'}
+                                                        onChange={() => setData('tipo_pago_preventa', 'completo')}
+                                                        className="text-[#ff5500] focus:ring-[#ff5500]" 
+                                                    />
+                                                    <span className="text-sm font-medium text-gray-700">Pago Completo</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input 
+                                                        type="radio" 
+                                                        checked={data.tipo_pago_preventa === 'parcial'}
+                                                        onChange={() => setData('tipo_pago_preventa', 'parcial')}
+                                                        className="text-[#ff5500] focus:ring-[#ff5500]" 
+                                                    />
+                                                    <span className="text-sm font-medium text-gray-700">Pago Parcial (Anticipo)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {data.tipo_pago_preventa === 'parcial' && (
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">PORCENTAJE DE ANTICIPO (%)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="1"
+                                                    max="99"
+                                                    value={data.porcentaje_anticipo}
+                                                    onChange={e => setData('porcentaje_anticipo', e.target.value)}
+                                                    placeholder="Ej. 20"
+                                                    className="w-full md:w-1/2 bg-white border border-gray-200 text-sm py-3 px-4 focus:ring-2 focus:ring-[#ff5500] focus:border-[#ff5500] text-gray-800 outline-none rounded-sm transition-all"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

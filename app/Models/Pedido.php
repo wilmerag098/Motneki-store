@@ -20,7 +20,9 @@ class Pedido extends Model
         'id_usuario',
         'id_direccion',
         'total',
+        'tipo_pedido',
         'estado',
+        'codigo_seguimiento',
     ];
 
     public function usuario()

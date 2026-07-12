@@ -44,64 +44,53 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 3. Categorías
-        $catFiguras = Categoria::create([
-            'nombre' => 'Figuras de Acción',
-            'descripcion' => 'Figuras a escala y coleccionables de tus animes favoritos.',
-            'activo' => true,
-        ]);
+        $catLlaveros = Categoria::create(['nombre' => 'Llaveros', 'descripcion' => 'Llaveros de colección.', 'activo' => true]);
+        $catFiguras = Categoria::create(['nombre' => 'Figuras', 'descripcion' => 'Figuras de acción y colección.', 'activo' => true]);
+        $catPeluches = Categoria::create(['nombre' => 'Peluches', 'descripcion' => 'Peluches de tus animes favoritos.', 'activo' => true]);
+        $catCollares = Categoria::create(['nombre' => 'Collares', 'descripcion' => 'Collares y accesorios.', 'activo' => true]);
+        $catRelojes = Categoria::create(['nombre' => 'Relojes', 'descripcion' => 'Relojes temáticos.', 'activo' => true]);
+        $catPolos = Categoria::create(['nombre' => 'Polos', 'descripcion' => 'Polos y ropa.', 'activo' => true]);
 
-        $catMangas = Categoria::create([
-            'nombre' => 'Mangas & Novelas',
-            'descripcion' => 'Colecciones de manga en español e inglés.',
-            'activo' => true,
-        ]);
+        // 4. Productos generados iterativamente (1 de stock, 1 preventa y 1 exclusivo por categoría)
+        $categoriasList = [
+            ['cat' => $catLlaveros, 'img' => '/images/Llavero01.webp', 'nombreBase' => 'Llavero'],
+            ['cat' => $catFiguras, 'img' => '/images/Figura01.webp', 'nombreBase' => 'Figura'],
+            ['cat' => $catPeluches, 'img' => '/images/Peluche01.webp', 'nombreBase' => 'Peluche'],
+            ['cat' => $catCollares, 'img' => '/images/Collar01.webp', 'nombreBase' => 'Collar'],
+            ['cat' => $catRelojes, 'img' => '/images/Reloj01.webp', 'nombreBase' => 'Reloj'],
+            ['cat' => $catPolos, 'img' => '/images/Polo01.webp', 'nombreBase' => 'Polo'],
+        ];
 
-        $catRopa = Categoria::create([
-            'nombre' => 'Ropa & Accesorios',
-            'descripcion' => 'Chaqueta, sudaderas y accesorios bordados.',
-            'activo' => true,
-        ]);
+        $tipos = ['stock', 'preventa', 'exclusivo'];
 
-        // 4. Productos
-        $prodLuffy = Producto::create([
-            'id_categoria' => $catFiguras->id_categoria,
-            'nombre' => 'Figura PVC Monkey D. Luffy - Gear 5 (18cm)',
-            'descripcion' => 'Increíble figura de Luffy Gear 5 liberando los tambores de la liberación. Pintura de alta calidad.',
-            'precio' => 1200.00,
-            'stock' => 12,
-            'disponibilidad' => 'stock',
-            'activo' => true,
-        ]);
+        foreach ($categoriasList as $catItem) {
+            foreach ($tipos as $tipo) {
+                
+                $data = [
+                    'id_categoria' => $catItem['cat']->id_categoria,
+                    'nombre' => $catItem['nombreBase'] . ' - Edición ' . ucfirst($tipo),
+                    'descripcion' => 'Este es un producto de prueba del tipo ' . $tipo . ' para la categoría ' . $catItem['nombreBase'] . '.',
+                    'precio' => rand(50, 500) + 0.99,
+                    'stock' => $tipo === 'stock' ? rand(5, 20) : ($tipo === 'exclusivo' ? rand(1, 3) : 0),
+                    'disponibilidad' => 'stock', // Ya no usamos "preventa" aquí, usamos tipo_producto
+                    'tipo_producto' => $tipo,
+                    'activo' => true,
+                    'fabricante' => 'MOTNEKI',
+                    'imagen_url' => $catItem['img'],
+                ];
 
-        $prodZoro = Producto::create([
-            'id_categoria' => $catFiguras->id_categoria,
-            'nombre' => 'Figura scale 1/7 Roronoa Zoro - Wano Country (Preventa)',
-            'descripcion' => 'Estatua escala 1/7 de Roronoa Zoro usando su ataque de tres espadas. Lanzamiento en Diciembre de 2026.',
-            'precio' => 2500.00,
-            'stock' => 0,
-            'disponibilidad' => 'preventa',
-            'activo' => true,
-        ]);
+                if ($tipo === 'preventa') {
+                    $data['fecha_inicio_preventa'] = now();
+                    $data['fecha_fin_preventa'] = now()->addDays(rand(10, 30));
+                    $data['fecha_disponibilidad'] = now()->addMonths(rand(2, 6));
+                    $data['tipo_pago_preventa'] = ['completo', 'parcial'][rand(0, 1)];
+                    $data['porcentaje_anticipo'] = $data['tipo_pago_preventa'] === 'parcial' ? 50.00 : null;
+                    $data['limite_preventa'] = rand(0, 1) ? rand(20, 50) : null;
+                }
 
-        $prodDemon = Producto::create([
-            'id_categoria' => $catMangas->id_categoria,
-            'nombre' => 'Demon Slayer Box Set - Vol. 1 al 23 Completo',
-            'descripcion' => 'Caja coleccionable con todos los volúmenes del manga de Koyoharu Gotouge.',
-            'precio' => 750.00,
-            'stock' => 5,
-            'disponibilidad' => 'stock',
-            'activo' => true,
-        ]);
-
-        $prodKatana = Producto::create([
-            'id_categoria' => $catFiguras->id_categoria,
-            'nombre' => 'Réplica Katana de Kokushibo - Bajo Demanda (Proxy)',
-            'descripcion' => 'Katana ornamental de acero inoxidable con el diseño del primer creciente demoníaco de Kokushibo. Producto importado bajo pedido.',
-            'precio' => 1100.00,
-            'stock' => 0,
-            'disponibilidad' => 'bajo demanda',
-            'activo' => true,
-        ]);
+                Producto::create($data);
+            }
+        }
 
         // 5. Dirección del cliente
         $direccion = Direccion::create([
@@ -122,11 +111,13 @@ class DatabaseSeeder extends Seeder
             'fecha_creacion' => now(),
         ]);
 
+        $primerProducto = Producto::first();
+
         DetallePedido::create([
             'id_pedido' => $pedido->id_pedido,
-            'id_producto' => $prodLuffy->id_producto,
+            'id_producto' => $primerProducto->id_producto,
             'cantidad' => 1,
-            'precio_unitario' => 1200.00,
+            'precio_unitario' => $primerProducto->precio,
         ]);
 
         Pago::create([

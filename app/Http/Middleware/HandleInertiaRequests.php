@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? $request->user()->load('rol') : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'solicitudes_pendientes_count' => \App\Models\SolicitudPersonalizada::where('estado', 'PENDIENTE')->count(),
         ];
     }
 }

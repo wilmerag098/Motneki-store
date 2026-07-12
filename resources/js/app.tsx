@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
+import PublicLayout from '@/layouts/public-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -12,12 +13,12 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome' || name === 'modules/Catalogo/Index' || name === 'preventas' || name === 'exclusivos' || name === 'comunidad' || name === 'favoritos' || name === 'carrito' || name === 'busqueda' || name.startsWith('admin/'):
+            case name === 'dashboard' || name === 'welcome' || name.startsWith('modules/') || name === 'preventas' || name === 'exclusivos' || name === 'comunidad' || name === 'favoritos' || name === 'carrito' || name === 'busqueda' || name.startsWith('admin/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return [PublicLayout, SettingsLayout];
             default:
                 return AppLayout;
         }
